@@ -77,5 +77,37 @@ module.exports = {
         }
       });
     });
+  },
+  getAllWebhooks: () => {
+    return new Promise((resolve, reject) => {
+      db.all("SELECT id, name, webhookUrl FROM users WHERE webhookUrl IS NOT NULL AND webhookUrl != ''", [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  },
+  getAdminStats: () => {
+    return new Promise((resolve, reject) => {
+      const queries = [
+        "SELECT COUNT(*) as totalUsers FROM users",
+        "SELECT COUNT(*) as usersWithWebhooks FROM users WHERE webhookUrl IS NOT NULL AND webhookUrl != ''",
+        "SELECT COUNT(*) as totalSubscriptions FROM subscriptions"
+      ];
+      
+      Promise.all(queries.map(query => 
+        new Promise((res, rej) => {
+          db.get(query, [], (err, row) => {
+            if (err) rej(err);
+            else res(row);
+          });
+        })
+      )).then(results => {
+        resolve({
+          totalUsers: results[0].totalUsers,
+          usersWithWebhooks: results[1].usersWithWebhooks,
+          totalSubscriptions: results[2].totalSubscriptions
+        });
+      }).catch(reject);
+    });
   }
 };
