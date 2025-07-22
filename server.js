@@ -58,8 +58,13 @@ app.get("/callback", async (req, res) => {
 
     const user = await userRes.json();
 
-    await db.addUser(user.id, `${user.username}#${user.discriminator}`);
-    req.session.user = { id: user.id, name: `${user.username}#${user.discriminator}` };
+    // Discord's new username system - discriminator is "0" for new usernames
+    const displayName = user.discriminator && user.discriminator !== "0" 
+      ? `${user.username}#${user.discriminator}` 
+      : user.username;
+
+    await db.addUser(user.id, displayName);
+    req.session.user = { id: user.id, name: displayName };
     res.redirect("/dashboard");
 
   } catch (err) {
@@ -71,7 +76,8 @@ app.get("/callback", async (req, res) => {
 app.get("/dashboard", async (req, res) => {
   if (!req.session.user) return res.redirect("/");
   const subscriptions = await db.getSubscriptions(req.session.user.id);
-  res.render("dashboard", { user: req.session.user, subscriptions });
+  const webhookUrl = await db.getUserWebhook(req.session.user.id);
+  res.render("dashboard", { user: req.session.user, subscriptions, webhookUrl });
 });
 
 app.post("/add", async (req, res) => {
@@ -86,6 +92,87 @@ app.post("/remove", async (req, res) => {
   const { name } = req.body;
   await db.removeSubscription(req.session.user.id, name);
   res.redirect("/dashboard");
+});
+
+app.post("/webhook", async (req, res) => {
+  if (!req.session.user) return res.redirect("/");
+  const { webhookUrl } = req.body;
+  await db.updateUserWebhook(req.session.user.id, webhookUrl);
+  res.redirect("/dashboard");
+});
+
+// Function to send Discord webhook notification
+async function sendDiscordNotification(webhookUrl, subscription) {
+  try {
+    const embed = {
+      title: "🔔 Subscription Renewal Reminder",
+      description: `Your **${subscription.name}** subscription is renewing soon!`,
+      color: 0x5865F2, // Discord blurple
+      fields: [
+        {
+          name: "💰 Price",
+          value: `$${subscription.price}/month`,
+          inline: true
+        },
+        {
+          name: "📅 Renewal Date",
+          value: new Date(subscription.renewsAt).toLocaleDateString(),
+          inline: true
+        },
+        {
+          name: "⏰ Notification",
+          value: `${subscription.notifyDays} day${subscription.notifyDays > 1 ? 's' : ''} before`,
+          inline: true
+        }
+      ],
+      footer: {
+        text: "Subscription Tracker"
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: "Subscription Tracker",
+        embeds: [embed]
+      })
+    });
+
+    if (!response.ok) {
+      console.error("Failed to send Discord notification:", response.statusText);
+    }
+  } catch (error) {
+    console.error("Error sending Discord notification:", error);
+  }
+}
+
+// Check for notifications daily (you can set up a cron job for this)
+async function checkNotifications() {
+  try {
+    const dueNotifications = await db.getSubscriptionsDueForNotification();
+    
+    for (const subscription of dueNotifications) {
+      if (subscription.webhookUrl) {
+        await sendDiscordNotification(subscription.webhookUrl, subscription);
+      }
+    }
+  } catch (error) {
+    console.error("Error checking notifications:", error);
+  }
+}
+
+// Run notification check every hour
+setInterval(checkNotifications, 60 * 60 * 1000);
+
+// Manual notification check endpoint (for testing)
+app.post("/check-notifications", async (req, res) => {
+  if (!req.session.user) return res.redirect("/");
+  await checkNotifications();
+  res.json({ message: "Notifications checked" });
 });
 
 app.get("/logout", (req, res) => {

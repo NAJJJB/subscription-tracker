@@ -35,6 +35,27 @@
       </div>
     </form>
     
+    <!-- Discord Webhook Configuration -->
+    <div style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px; border-left: 4px solid #5865F2;">
+      <h3 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">🔔 Discord Notifications</h3>
+      <form method="POST" action="/webhook" style="display: flex; gap: 1rem; align-items: center;">
+        <input 
+          name="webhookUrl" 
+          type="url" 
+          placeholder="Discord Webhook URL (optional)" 
+          value="<%= webhookUrl || '' %>"
+          style="flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;"
+        />
+        <button type="submit" style="background: #5865F2; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">
+          Save Webhook
+        </button>
+      </form>
+      <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.75rem;">
+        Add a Discord webhook URL to receive renewal notifications. 
+        <a href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks" target="_blank" style="color: #5865F2;">Learn how to create webhooks</a>
+      </p>
+    </div>
+    
     <div class="subscriptions-list">
       <% if (subscriptions.length > 0) { %>
         <h3 style="margin-bottom: 1rem; color: #374151;">Your Subscriptions</h3>
