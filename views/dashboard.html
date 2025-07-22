@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Dashboard</title></head>
+<body>
+  <h1>Welcome, <%= user.name %></h1>
+  <form method="POST" action="/add">
+    <input name="name" placeholder="Subscription name" required />
+    <input name="price" type="number" step="0.01" placeholder="Price" required />
+    <button>Add</button>
+  </form>
+  <ul>
+    <% subscriptions.forEach(sub => { %>
+      <li><%= sub.name %>: $<%= sub.price %></li>
+    <% }) %>
+  </ul>
+</body>
+</html>

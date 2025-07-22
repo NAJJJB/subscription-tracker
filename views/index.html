@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Login</title></head>
+<body>
+  <h1>Welcome!</h1>
+  <% if (user) { %>
+    <p>Logged in as <%= user.name %></p>
+    <a href="/dashboard">Go to Dashboard</a>
+  <% } else { %>
+    <a href="/login">Login with Discord</a>
+  <% } %>
+</body>
+</html>
