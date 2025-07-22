@@ -83,7 +83,18 @@ app.get("/dashboard", async (req, res) => {
 app.post("/add", async (req, res) => {
   if (!req.session.user) return res.redirect("/");
   const { name, price, renewsAt, notifyDays } = req.body;
+  
+  // Add subscription to database
   await db.addSubscription(req.session.user.id, name, price, renewsAt, notifyDays);
+  
+  // Send new subscription notification
+  await sendNewSubscriptionNotification(req.session.user.id, {
+    name,
+    price,
+    renewsAt,
+    notifyDays
+  });
+  
   res.redirect("/dashboard");
 });
 
@@ -102,34 +113,65 @@ app.post("/webhook", async (req, res) => {
 });
 
 // Function to send Discord webhook notification
-async function sendDiscordNotification(webhookUrl, subscription) {
+async function sendDiscordNotification(webhookUrl, subscription, type = 'renewal') {
   try {
-    const embed = {
-      title: "🔔 Subscription Renewal Reminder",
-      description: `Your **${subscription.name}** subscription is renewing soon!`,
-      color: 0x5865F2, // Discord blurple
-      fields: [
-        {
-          name: "💰 Price",
-          value: `$${subscription.price}/month`,
-          inline: true
+    let embed;
+    
+    if (type === 'new') {
+      embed = {
+        title: "✅ New Subscription Added",
+        description: `You've successfully added **${subscription.name}** to your subscription tracker!`,
+        color: 0x10B981, // Green color for success
+        fields: [
+          {
+            name: "💰 Price",
+            value: `$${subscription.price}/month`,
+            inline: true
+          },
+          {
+            name: "📅 Renewal Date",
+            value: new Date(subscription.renewsAt).toLocaleDateString(),
+            inline: true
+          },
+          {
+            name: "⏰ Notification",
+            value: `${subscription.notifyDays} day${subscription.notifyDays > 1 ? 's' : ''} before`,
+            inline: true
+          }
+        ],
+        footer: {
+          text: "Subscription Tracker"
         },
-        {
-          name: "📅 Renewal Date",
-          value: new Date(subscription.renewsAt).toLocaleDateString(),
-          inline: true
+        timestamp: new Date().toISOString()
+      };
+    } else {
+      embed = {
+        title: "🔔 Subscription Renewal Reminder",
+        description: `Your **${subscription.name}** subscription is renewing soon!`,
+        color: 0x5865F2, // Discord blurple
+        fields: [
+          {
+            name: "💰 Price",
+            value: `$${subscription.price}/month`,
+            inline: true
+          },
+          {
+            name: "📅 Renewal Date",
+            value: new Date(subscription.renewsAt).toLocaleDateString(),
+            inline: true
+          },
+          {
+            name: "⏰ Notification",
+            value: `${subscription.notifyDays} day${subscription.notifyDays > 1 ? 's' : ''} before`,
+            inline: true
+          }
+        ],
+        footer: {
+          text: "Subscription Tracker"
         },
-        {
-          name: "⏰ Notification",
-          value: `${subscription.notifyDays} day${subscription.notifyDays > 1 ? 's' : ''} before`,
-          inline: true
-        }
-      ],
-      footer: {
-        text: "Subscription Tracker"
-      },
-      timestamp: new Date().toISOString()
-    };
+        timestamp: new Date().toISOString()
+      };
+    }
 
     const response = await fetch(webhookUrl, {
       method: "POST",
@@ -150,6 +192,23 @@ async function sendDiscordNotification(webhookUrl, subscription) {
   }
 }
 
+// Function to send new subscription notification (easy to disable)
+async function sendNewSubscriptionNotification(userId, subscriptionData) {
+  // FEATURE FLAG: Set to false to disable new subscription notifications
+  const ENABLE_NEW_SUB_NOTIFICATIONS = true;
+  
+  if (!ENABLE_NEW_SUB_NOTIFICATIONS) return;
+  
+  try {
+    const webhookUrl = await db.getUserWebhook(userId);
+    if (webhookUrl) {
+      await sendDiscordNotification(webhookUrl, subscriptionData, 'new');
+    }
+  } catch (error) {
+    console.error("Error sending new subscription notification:", error);
+  }
+}
+
 // Check for notifications daily (you can set up a cron job for this)
 async function checkNotifications() {
   try {
@@ -157,7 +216,7 @@ async function checkNotifications() {
     
     for (const subscription of dueNotifications) {
       if (subscription.webhookUrl) {
-        await sendDiscordNotification(subscription.webhookUrl, subscription);
+        await sendDiscordNotification(subscription.webhookUrl, subscription, 'renewal');
       }
     }
   } catch (error) {
