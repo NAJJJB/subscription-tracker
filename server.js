@@ -140,7 +140,7 @@ async function sendDiscordNotification(webhookUrl, subscription, type = 'renewal
           }
         ],
         footer: {
-          text: "Subscription Tracker"
+          text: "This was an automatic notification from https://subs.najjjb.xyz",
         },
         timestamp: new Date().toISOString()
       };
@@ -209,7 +209,7 @@ async function sendNewSubscriptionNotification(userId, subscriptionData) {
   }
 }
 
-// Check for notifications daily (you can set up a cron job for this)
+// Check for notifications daily (can set up cron job)
 async function checkNotifications() {
   try {
     const dueNotifications = await db.getSubscriptionsDueForNotification();
