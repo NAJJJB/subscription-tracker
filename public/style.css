@@ -1,2 +1,296 @@
-body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
-input { margin: 0.5rem; }
+/* Import Google Fonts for customizable typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --discord-blurple: #5865F2;
+  --discord-blurple-dark: #4752C4;
+  --discord-dark: #2C2F33;
+  --discord-darker: #23272A;
+  --text-light: #99AAB5;
+  --text-white: #FFFFFF;
+  --background-light: #F6F6F6;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 3rem 2.5rem;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header {
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--discord-blurple), #7289da);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+  font-weight: 400;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.description {
+  font-size: 0.95rem;
+  color: #9ca3af;
+  line-height: 1.5;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.auth-section {
+  margin: 2rem 0;
+}
+
+.discord-login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--discord-blurple);
+  color: var(--text-white);
+  text-decoration: none;
+  padding: 16px 32px;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(88, 101, 242, 0.3);
+  border: none;
+  cursor: pointer;
+  min-width: 220px;
+}
+
+.discord-login-btn:hover {
+  background: var(--discord-blurple-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(88, 101, 242, 0.4);
+}
+
+.discord-login-btn:active {
+  transform: translateY(0);
+}
+
+.discord-icon {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.dashboard-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--discord-blurple);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.dashboard-link:hover {
+  color: var(--discord-blurple-dark);
+}
+
+.user-info {
+  background: rgba(88, 101, 242, 0.1);
+  border: 1px solid rgba(88, 101, 242, 0.2);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.welcome-text {
+  color: var(--discord-dark);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.user-name {
+  color: var(--discord-blurple);
+  font-weight: 700;
+}
+
+.logout-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.logout-btn:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}
+
+/* Logout page specific styles */
+.logout-confirmation {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logout-icon {
+  width: 48px;
+  height: 48px;
+  color: #22c55e;
+  stroke-width: 1.5;
+}
+
+.logout-message {
+  color: #166534;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.alternative-actions {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.home-link {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.home-link:hover {
+  color: var(--discord-blurple);
+  background: rgba(88, 101, 242, 0.1);
+}
+
+/* Dashboard specific styles */
+.dashboard-container {
+  background: var(--text-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.form-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  min-width: 200px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--discord-blurple);
+}
+
+button:not(.discord-login-btn) {
+  background: var(--discord-blurple);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:not(.discord-login-btn):hover {
+  background: var(--discord-blurple-dark);
+}
+
+ul {
+  list-style: none;
+}
+
+li {
+  background: var(--background-light);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid var(--discord-blurple);
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .container {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+  
+  .logo {
+    font-size: 2rem;
+  }
+  
+  .form-group {
+    flex-direction: column;
+  }
+  
+  input {
+    min-width: auto;
+  }
+}
