@@ -3,15 +3,19 @@ const db = new sqlite3.Database("subs.db");
 
 db.serialize(() => {
   db.run("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT)");
-  db.run("CREATE TABLE IF NOT EXISTS subscriptions (userId TEXT, name TEXT, price REAL)");
+  db.run("CREATE TABLE IF NOT EXISTS subscriptions (userId TEXT, name TEXT, price REAL, renewsAt TEXT, notifyDays INTEGER)");
+  
+  // Add new columns to existing table if they don't exist
+  db.run("ALTER TABLE subscriptions ADD COLUMN renewsAt TEXT", () => {});
+  db.run("ALTER TABLE subscriptions ADD COLUMN notifyDays INTEGER", () => {});
 });
 
 module.exports = {
   addUser: (id, name) => {
     db.run("INSERT OR IGNORE INTO users (id, name) VALUES (?, ?)", [id, name]);
   },
-  addSubscription: (userId, name, price) => {
-    db.run("INSERT INTO subscriptions (userId, name, price) VALUES (?, ?, ?)", [userId, name, price]);
+  addSubscription: (userId, name, price, renewsAt, notifyDays) => {
+    db.run("INSERT INTO subscriptions (userId, name, price, renewsAt, notifyDays) VALUES (?, ?, ?, ?, ?)", [userId, name, price, renewsAt, notifyDays]);
   },
   getSubscriptions: (userId) => {
     return new Promise((resolve, reject) => {

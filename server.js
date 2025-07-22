@@ -76,8 +76,8 @@ app.get("/dashboard", async (req, res) => {
 
 app.post("/add", async (req, res) => {
   if (!req.session.user) return res.redirect("/");
-  const { name, price } = req.body;
-  await db.addSubscription(req.session.user.id, name, price);
+  const { name, price, renewsAt, notifyDays } = req.body;
+  await db.addSubscription(req.session.user.id, name, price, renewsAt, notifyDays);
   res.redirect("/dashboard");
 });
 
