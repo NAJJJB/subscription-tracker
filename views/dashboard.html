@@ -26,7 +26,13 @@
         <h3 style="margin-bottom: 1rem; color: #374151;">Your Subscriptions</h3>
         <ul>
           <% subscriptions.forEach(sub => { %>
-            <li><%= sub.name %>: $<%= sub.price %>/month</li>
+            <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb;">
+              <span><%= sub.name %>: $<%= sub.price %>/month</span>
+              <form method="POST" action="/remove" style="margin: 0;">
+                <input type="hidden" name="name" value="<%= sub.name %>" />
+                <button type="submit" style="background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;" onclick="return confirm('Are you sure you want to remove this subscription?')">Remove</button>
+              </form>
+            </li>
           <% }) %>
         </ul>
         <div style="margin-top: 1.5rem; padding: 1rem; background: #f3f4f6; border-radius: 8px;">

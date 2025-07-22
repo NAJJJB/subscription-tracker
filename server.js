@@ -15,7 +15,8 @@ app.set("views", path.join(__dirname, "views"));
 app.engine("html", require("ejs").renderFile);
 app.set("view engine", "html");
 
-const redirectUri = `https://subs.najjjb.xyz/callback`;
+// const redirectUri = `https://subs.najjjb.xyz/callback`;
+const redirectUri = `http://localhost:8080/callback`;
 
 app.get("/", (req, res) => {
   res.render("index", { user: req.session.user });
@@ -77,6 +78,13 @@ app.post("/add", async (req, res) => {
   if (!req.session.user) return res.redirect("/");
   const { name, price } = req.body;
   await db.addSubscription(req.session.user.id, name, price);
+  res.redirect("/dashboard");
+});
+
+app.post("/remove", async (req, res) => {
+  if (!req.session.user) return res.redirect("/");
+  const { name } = req.body;
+  await db.removeSubscription(req.session.user.id, name);
   res.redirect("/dashboard");
 });
 

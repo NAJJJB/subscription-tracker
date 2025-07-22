@@ -20,5 +20,13 @@ module.exports = {
         else resolve(rows);
       });
     });
+  },
+  removeSubscription: (userId, name) => {
+    return new Promise((resolve, reject) => {
+      db.run("DELETE FROM subscriptions WHERE userId = ? AND name = ?", [userId, name], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      });
+    });
   }
 };
