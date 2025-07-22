@@ -88,4 +88,13 @@ app.post("/remove", async (req, res) => {
   res.redirect("/dashboard");
 });
 
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error destroying session:", err);
+    }
+    res.redirect("/");
+  });
+});
+
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

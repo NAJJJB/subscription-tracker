@@ -9,8 +9,13 @@
 <body>
   <div class="dashboard-container">
     <div class="header">
-      <h1 class="logo">Welcome, <%= user.name %>!</h1>
-      <p class="subtitle">Manage your subscriptions</p>
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div>
+          <h1 class="logo">Welcome, <%= user.name %>!</h1>
+          <p class="subtitle">Manage your subscriptions</p>
+        </div>
+        <a href="/logout" style="background: #6b7280; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; transition: background 0.2s;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">Logout</a>
+      </div>
     </div>
     
     <form method="POST" action="/add">
