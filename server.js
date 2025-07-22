@@ -28,8 +28,8 @@ app.set("views", path.join(__dirname, "views"));
 app.engine("html", require("ejs").renderFile);
 app.set("view engine", "html");
 
-// const redirectUri = `https://subs.najjjb.xyz/callback`;
-const redirectUri = `http://localhost:8080/callback`;
+const redirectUri = `https://subs.najjjb.xyz/callback`;
+// const redirectUri = `http://localhost:8080/callback`;
 
 app.get("/", (req, res) => {
   res.render("index", { user: req.session.user });
