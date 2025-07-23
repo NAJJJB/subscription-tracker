@@ -28,6 +28,160 @@ app.set("views", path.join(__dirname, "views"));
 app.engine("html", require("ejs").renderFile);
 app.set("view engine", "html");
 
+// Helper function to get currency symbol with comprehensive currency support
+function getCurrencySymbol(currency) {
+  const symbols = {
+    // Alphabetically ordered by currency code
+    'AED': 'د.إ',   // UAE Dirham
+    'AFN': '؋',     // Afghan Afghani
+    'ALL': 'L',     // Albanian Lek
+    'AMD': '֏',     // Armenian Dram
+    'ARS': '$',     // Argentine Peso
+    'AUD': 'A$',    // Australian Dollar
+    'AZN': '₼',     // Azerbaijani Manat
+    'BAM': 'KM',    // Bosnia-Herzegovina Convertible Mark
+    'BDT': '৳',     // Bangladeshi Taka
+    'BGN': 'лв',    // Bulgarian Lev
+    'BHD': '.د.ب',  // Bahraini Dinar
+    'BRL': 'R$',    // Brazilian Real
+    'BTN': 'Nu.',   // Bhutanese Ngultrum
+    'BYN': 'Br',    // Belarusian Ruble
+    'CAD': 'C$',    // Canadian Dollar
+    'CHF': 'CHF',   // Swiss Franc
+    'CLP': '$',     // Chilean Peso
+    'CNY': '¥',     // Chinese Yuan
+    'COP': '$',     // Colombian Peso
+    'CZK': 'Kč',    // Czech Koruna
+    'DKK': 'kr',    // Danish Krone
+    'EGP': '£',     // Egyptian Pound
+    'EUR': '€',     // Euro
+    'GBP': '£',     // British Pound
+    'GEL': '₾',     // Georgian Lari
+    'HKD': 'HK$',   // Hong Kong Dollar
+    'HRK': 'kn',    // Croatian Kuna
+    'HUF': 'Ft',    // Hungarian Forint
+    'IDR': 'Rp',    // Indonesian Rupiah
+    'ILS': '₪',     // Israeli Shekel
+    'INR': '₹',     // Indian Rupee
+    'ISK': 'kr',    // Icelandic Krona
+    'JOD': 'د.ا',   // Jordanian Dinar
+    'JPY': '¥',     // Japanese Yen
+    'KGS': 'с',     // Kyrgyzstani Som
+    'KRW': '₩',     // South Korean Won
+    'KWD': 'د.ك',   // Kuwaiti Dinar
+    'KZT': '₸',     // Kazakhstani Tenge
+    'LBP': '£',     // Lebanese Pound
+    'LKR': '₨',     // Sri Lankan Rupee
+    'MDL': 'L',     // Moldovan Leu
+    'MKD': 'ден',   // Macedonian Denar
+    'MVR': '.ރ',    // Maldivian Rufiyaa
+    'MXN': '$',     // Mexican Peso
+    'MYR': 'RM',    // Malaysian Ringgit
+    'NOK': 'kr',    // Norwegian Krone
+    'NPR': '₨',     // Nepalese Rupee
+    'NZD': 'NZ$',   // New Zealand Dollar
+    'OMR': '﷼',     // Omani Rial
+    'PEN': 'S/',    // Peruvian Sol
+    'PHP': '₱',     // Philippine Peso
+    'PKR': '₨',     // Pakistani Rupee
+    'PLN': 'zł',    // Polish Zloty
+    'QAR': '﷼',     // Qatari Riyal
+    'RON': 'lei',   // Romanian Leu
+    'RSD': 'din',   // Serbian Dinar
+    'RUB': '₽',     // Russian Ruble
+    'SAR': '﷼',     // Saudi Riyal
+    'SEK': 'kr',    // Swedish Krona
+    'SGD': 'S$',    // Singapore Dollar
+    'THB': '฿',     // Thai Baht
+    'TJS': 'ЅМ',    // Tajikistani Somoni
+    'TMT': 'T',     // Turkmenistani Manat
+    'TRY': '₺',     // Turkish Lira
+    'UAH': '₴',     // Ukrainian Hryvnia
+    'USD': '$',     // US Dollar
+    'UYU': '$',     // Uruguayan Peso
+    'UZS': 'soʻm',  // Uzbekistani Som
+    'VND': '₫',     // Vietnamese Dong
+    'ZAR': 'R',     // South African Rand
+  };
+  return symbols[currency] || currency;
+}
+
+// Function to get all available currencies for dropdown
+function getAllCurrencies() {
+  return [
+    { code: 'AFN', name: 'Afghan afghani', symbol: '؋' },
+    { code: 'ALL', name: 'Albanian lek', symbol: 'L' },
+    { code: 'ARS', name: 'Argentine peso', symbol: '$' },
+    { code: 'AMD', name: 'Armenian dram', symbol: '֏' },
+    { code: 'AUD', name: 'Australian dollar', symbol: 'A$' },
+    { code: 'AZN', name: 'Azerbaijani manat', symbol: '₼' },
+    { code: 'BHD', name: 'Bahraini dinar', symbol: '.د.ب' },
+    { code: 'BDT', name: 'Bangladeshi taka', symbol: '৳' },
+    { code: 'BYN', name: 'Belarusian ruble', symbol: 'Br' },
+    { code: 'BTN', name: 'Bhutanese ngultrum', symbol: 'Nu.' },
+    { code: 'BAM', name: 'Bosnia-Herzegovina convertible mark', symbol: 'KM' },
+    { code: 'BRL', name: 'Brazilian real', symbol: 'R$' },
+    { code: 'GBP', name: 'British pound', symbol: '£' },
+    { code: 'BGN', name: 'Bulgarian lev', symbol: 'лв' },
+    { code: 'CAD', name: 'Canadian dollar', symbol: 'C$' },
+    { code: 'CLP', name: 'Chilean peso', symbol: '$' },
+    { code: 'CNY', name: 'Chinese yuan', symbol: '¥' },
+    { code: 'COP', name: 'Colombian peso', symbol: '$' },
+    { code: 'HRK', name: 'Croatian kuna', symbol: 'kn' },
+    { code: 'CZK', name: 'Czech koruna', symbol: 'Kč' },
+    { code: 'DKK', name: 'Danish krone', symbol: 'kr' },
+    { code: 'EGP', name: 'Egyptian pound', symbol: '£' },
+    { code: 'EUR', name: 'Euro', symbol: '€' },
+    { code: 'GEL', name: 'Georgian lari', symbol: '₾' },
+    { code: 'HKD', name: 'Hong Kong dollar', symbol: 'HK$' },
+    { code: 'HUF', name: 'Hungarian forint', symbol: 'Ft' },
+    { code: 'ISK', name: 'Icelandic krona', symbol: 'kr' },
+    { code: 'INR', name: 'Indian rupee', symbol: '₹' },
+    { code: 'IDR', name: 'Indonesian rupiah', symbol: 'Rp' },
+    { code: 'ILS', name: 'Israeli shekel', symbol: '₪' },
+    { code: 'JPY', name: 'Japanese yen', symbol: '¥' },
+    { code: 'JOD', name: 'Jordanian dinar', symbol: 'د.ا' },
+    { code: 'KZT', name: 'Kazakhstani tenge', symbol: '₸' },
+    { code: 'KWD', name: 'Kuwaiti dinar', symbol: 'د.ك' },
+    { code: 'KGS', name: 'Kyrgyzstani som', symbol: 'с' },
+    { code: 'LBP', name: 'Lebanese pound', symbol: '£' },
+    { code: 'MKD', name: 'Macedonian denar', symbol: 'ден' },
+    { code: 'MYR', name: 'Malaysian ringgit', symbol: 'RM' },
+    { code: 'MVR', name: 'Maldivian rufiyaa', symbol: '.ރ' },
+    { code: 'MXN', name: 'Mexican peso', symbol: '$' },
+    { code: 'MDL', name: 'Moldovan leu', symbol: 'L' },
+    { code: 'NPR', name: 'Nepalese rupee', symbol: '₨' },
+    { code: 'NZD', name: 'New Zealand dollar', symbol: 'NZ$' },
+    { code: 'NOK', name: 'Norwegian krone', symbol: 'kr' },
+    { code: 'OMR', name: 'Omani rial', symbol: '﷼' },
+    { code: 'PKR', name: 'Pakistani rupee', symbol: '₨' },
+    { code: 'PEN', name: 'Peruvian sol', symbol: 'S/' },
+    { code: 'PHP', name: 'Philippine peso', symbol: '₱' },
+    { code: 'PLN', name: 'Polish zloty', symbol: 'zł' },
+    { code: 'QAR', name: 'Qatari riyal', symbol: '﷼' },
+    { code: 'RON', name: 'Romanian leu', symbol: 'lei' },
+    { code: 'RUB', name: 'Russian ruble', symbol: '₽' },
+    { code: 'SAR', name: 'Saudi riyal', symbol: '﷼' },
+    { code: 'RSD', name: 'Serbian dinar', symbol: 'din' },
+    { code: 'SGD', name: 'Singapore dollar', symbol: 'S$' },
+    { code: 'ZAR', name: 'South African rand', symbol: 'R' },
+    { code: 'KRW', name: 'South Korean won', symbol: '₩' },
+    { code: 'LKR', name: 'Sri Lankan rupee', symbol: '₨' },
+    { code: 'SEK', name: 'Swedish krona', symbol: 'kr' },
+    { code: 'CHF', name: 'Swiss franc', symbol: 'CHF' },
+    { code: 'TJS', name: 'Tajikistani somoni', symbol: 'ЅМ' },
+    { code: 'THB', name: 'Thai baht', symbol: '฿' },
+    { code: 'TRY', name: 'Turkish lira', symbol: '₺' },
+    { code: 'TMT', name: 'Turkmenistani manat', symbol: 'T' },
+    { code: 'AED', name: 'UAE dirham', symbol: 'د.إ' },
+    { code: 'UAH', name: 'Ukrainian hryvnia', symbol: '₴' },
+    { code: 'UYU', name: 'Uruguayan peso', symbol: '$' },
+    { code: 'USD', name: 'US dollar', symbol: '$' },
+    { code: 'UZS', name: 'Uzbekistani som', symbol: 'soʻm' },
+    { code: 'VND', name: 'Vietnamese dong', symbol: '₫' },
+  ];
+}
+
 const redirectUri = `https://subs.najjjb.xyz/callback`;
 // const redirectUri = `http://localhost:8080/callback`;
 
@@ -93,9 +247,60 @@ app.get("/callback", async (req, res) => {
 
 app.get("/dashboard", async (req, res) => {
   if (!req.session.user) return res.redirect("/");
-  const subscriptions = await db.getSubscriptions(req.session.user.id);
-  const webhookUrl = await db.getUserWebhook(req.session.user.id);
-  res.render("dashboard", { user: req.session.user, subscriptions, webhookUrl });
+  
+  try {
+    const subscriptions = await db.getSubscriptions(req.session.user.id);
+    const preferences = await db.getUserPreferences(req.session.user.id);
+    const currency = preferences.currency || 'USD';
+    const webhookUrl = preferences.webhookUrl || '';
+    const allCurrencies = getAllCurrencies();
+    
+    // Helper functions for calculations
+    const calculateMonthlyCost = () => {
+      let total = 0;
+      subscriptions.forEach(sub => {
+        const price = parseFloat(sub.price);
+        const frequency = sub.renewalFrequency || 'monthly';
+        
+        switch(frequency) {
+          case 'weekly':
+            total += price * 4.33;
+            break;
+          case 'monthly':
+            total += price;
+            break;
+          case 'quarterly':
+            total += price / 3;
+            break;
+          case 'semi-annually':
+            total += price / 6;
+            break;
+          case 'yearly':
+            total += price / 12;
+            break;
+          default:
+            total += price;
+        }
+      });
+      return total;
+    };
+    
+    const calculateYearlyCost = () => calculateMonthlyCost() * 12;
+    
+    res.render("dashboard", { 
+      user: req.session.user, 
+      subscriptions, 
+      currency,
+      webhookUrl,
+      allCurrencies,
+      getCurrencySymbol,
+      calculateMonthlyCost,
+      calculateYearlyCost
+    });
+  } catch (error) {
+    console.error('Dashboard error:', error);
+    res.status(500).send('Server error');
+  }
 });
 
 // Admin login page
@@ -134,6 +339,20 @@ app.post("/webhook", async (req, res) => {
   const { webhookUrl } = req.body;
   await db.updateUserWebhook(req.session.user.id, webhookUrl);
   res.redirect("/dashboard");
+});
+
+// Settings route for handling both currency and webhook updates
+app.post("/settings", async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: "Unauthorized" });
+  
+  try {
+    const { currency, webhookUrl } = req.body;
+    await db.updateUserPreferences(req.session.user.id, webhookUrl || '', currency || 'USD');
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Settings update error:', error);
+    res.status(500).json({ error: "Failed to update settings" });
+  }
 });
 
 // Function to send Discord webhook notification

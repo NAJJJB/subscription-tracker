@@ -5,6 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Subscription Tracker</title>
   <link rel="stylesheet" href="/style.css">
+  <style>
+    .settings-icon {
+      position: relative;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      color: #6b7280;
+    }
+    .settings-icon:hover {
+      background: #f3f4f6;
+      color: #374151;
+      transform: rotate(90deg);
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 0.25rem;
+      border-radius: 4px;
+    }
+    .close-btn:hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+    .setting-group {
+      margin-bottom: 1.5rem;
+    }
+    .setting-label {
+      display: block;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+    }
+    .setting-description {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 0.75rem;
+    }
+    .currency-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      background: white;
+      transition: border-color 0.2s;
+    }
+    .currency-select:focus {
+      outline: none;
+      border-color: #5865F2;
+    }
+    .currency-option {
+      padding: 0.5rem;
+    }
+  </style>
 </head>
 <body>
   <div class="dashboard-container">
@@ -14,7 +109,59 @@
           <h1 class="logo">Welcome, <%= user.name %>!</h1>
           <p class="subtitle">Manage your subscriptions</p>
         </div>
-        <a href="/logout" style="background: #6b7280; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; transition: background 0.2s;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">Logout</a>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <div class="settings-icon" onclick="openSettings()" title="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <a href="/logout" style="background: #6b7280; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; transition: background 0.2s;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">Logout</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Settings</h2>
+          <button class="close-btn" onclick="closeSettings()">&times;</button>
+        </div>
+        
+        <form id="settingsForm">
+          <div class="setting-group">
+            <label class="setting-label" for="currencySelect">Currency Preference</label>
+            <p class="setting-description">Choose your preferred currency. Changes will apply immediately to all prices displayed</p>
+            <select id="currencySelect" name="currency" class="currency-select">
+              <% allCurrencies.forEach(curr => { %>
+                <option value="<%= curr.code %>" <%= currency === curr.code ? 'selected' : '' %>>
+                  <%= curr.name %>
+                </option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-label" for="webhookUrl">Discord Webhook URL</label>
+            <p class="setting-description">Get notified in Discord when subscriptions are due for renewal</p>
+            <input type="url" id="webhookUrl" name="webhookUrl" placeholder="https://discord.com/api/webhooks/..." 
+                   value="<%= webhookUrl || '' %>" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; transition: border-color 0.2s;" 
+                   onfocus="this.style.borderColor='#5865F2'" onblur="this.style.borderColor='#e5e7eb'">
+            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.75rem;">
+              <a href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks" target="_blank" style="color: #5865F2;">Learn how to create Discord webhooks</a>
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+            <button type="button" onclick="closeSettings()" style="padding: 0.75rem 1.5rem; border: 2px solid #e5e7eb; background: white; color: #374151; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+              Cancel
+            </button>
+            <button type="submit" style="padding: 0.75rem 1.5rem; border: none; background: #5865F2; color: white; border-radius: 8px; cursor: pointer; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#4752C4'" onmouseout="this.style.background='#5865F2'">
+              Save Settings
+            </button>
+          </div>
+        </form>
       </div>
     </div>
     
@@ -42,26 +189,21 @@
         <button type="submit" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Add Subscription</button>
       </div>
     </form>
-    
-    <!-- Discord Webhook Configuration -->
-    <div style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px; border-left: 4px solid #5865F2;">
-      <h3 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">🔔 Discord Notifications</h3>
-      <form method="POST" action="/webhook" style="display: flex; gap: 1rem; align-items: center;">
-        <input 
-          name="webhookUrl" 
-          type="url" 
-          placeholder="Discord Webhook URL (optional)" 
-          value="<%= webhookUrl || '' %>"
-          style="flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;"
-        />
-        <button type="submit" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #5865F2; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">
-          Save Webhook
-        </button>
-      </form>
-      <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.75rem;">
-        Add a Discord webhook URL to receive renewal notifications. 
-        <a href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks" target="_blank" style="color: #5865F2;">Learn how to create webhooks</a>
-      </p>
+
+    <!-- Stats Section -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+      <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; text-align: center;">
+        <h3 style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em;">Total Subscriptions</h3>
+        <p style="margin: 0; font-size: 2rem; font-weight: 700; color: #374151;"><%= subscriptions.length %></p>
+      </div>
+      <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; text-align: center;">
+        <h3 style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em;">Monthly Cost</h3>
+        <p style="margin: 0; font-size: 2rem; font-weight: 700; color: #059669;"><%= getCurrencySymbol(currency) %><%= calculateMonthlyCost().toFixed(2) %></p>
+      </div>
+      <div style="background: #f8fafc; padding: 1.5rem; border-radius: 8px; text-align: center;">
+        <h3 style="margin: 0 0 0.5rem 0; color: #6b7280; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em;">Yearly Cost</h3>
+        <p style="margin: 0; font-size: 2rem; font-weight: 700; color: #dc2626;"><%= getCurrencySymbol(currency) %><%= calculateYearlyCost().toFixed(2) %></p>
+      </div>
     </div>
     
     <div class="subscriptions-list">
@@ -74,7 +216,7 @@
                 <div>
                   <h4 style="margin: 0; color: #374151; font-size: 1.125rem;"><%= sub.name %></h4>
                   <p style="margin: 0.25rem 0; color: #059669; font-weight: 600;">
-                    $<%= sub.price %>/<%= sub.renewalFrequency || 'month' %>
+                    <%= getCurrencySymbol(currency) %><%= sub.price %>/<%= sub.renewalFrequency || 'month' %>
                   </p>
                 </div>
                 <form method="POST" action="/remove" style="margin: 0;">
@@ -125,10 +267,10 @@
               }
             });
           %>
-          <strong>Total Monthly Equivalent: $<%= totalMonthlyCost.toFixed(2) %></strong>
+          <strong>Total Monthly Equivalent: <%= getCurrencySymbol(currency) %><%= totalMonthlyCost.toFixed(2) %></strong>
           <br>
           <small style="color: #6b7280; margin-top: 0.5rem; display: block;">
-            Estimated yearly cost: $<%= (totalMonthlyCost * 12).toFixed(2) %>
+            Estimated yearly cost: <%= getCurrencySymbol(currency) %><%= (totalMonthlyCost * 12).toFixed(2) %>
           </small>
         </div>
       <% } else { %>
@@ -138,5 +280,53 @@
       <% } %>
     </div>
   </div>
+
+  <script>
+    function openSettings() {
+      document.getElementById('settingsModal').style.display = 'flex';
+    }
+    
+    function closeSettings() {
+      document.getElementById('settingsModal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('settingsModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeSettings();
+      }
+    });
+    
+    // Handle settings form submission
+    document.getElementById('settingsForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = {
+        currency: formData.get('currency'),
+        webhookUrl: formData.get('webhookUrl')
+      };
+      
+      try {
+        const response = await fetch('/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          // Reload the page to reflect currency changes
+          window.location.reload();
+        } else {
+          alert('Failed to save settings. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error saving settings:', error);
+        alert('Failed to save settings. Please try again.');
+      }
+    });
+  </script>
 </body>
 </html>

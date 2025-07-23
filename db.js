@@ -10,6 +10,7 @@ db.serialize(() => {
   db.run("ALTER TABLE subscriptions ADD COLUMN notifyDays INTEGER", () => {});
   db.run("ALTER TABLE users ADD COLUMN webhookUrl TEXT", () => {});
   db.run("ALTER TABLE subscriptions ADD COLUMN renewalFrequency TEXT", () => {});
+  db.run("ALTER TABLE users ADD COLUMN currency TEXT DEFAULT 'USD'", () => {});
 });
 
 module.exports = {
@@ -109,6 +110,30 @@ module.exports = {
           totalSubscriptions: results[2].totalSubscriptions
         });
       }).catch(reject);
+    });
+  },
+  getUserPreferences: (userId) => {
+    return new Promise((resolve, reject) => {
+      db.get("SELECT webhookUrl, currency FROM users WHERE id = ?", [userId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row || { webhookUrl: null, currency: 'USD' });
+      });
+    });
+  },
+  updateUserCurrency: (userId, currency) => {
+    return new Promise((resolve, reject) => {
+      db.run("UPDATE users SET currency = ? WHERE id = ?", [currency, userId], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      });
+    });
+  },
+  updateUserPreferences: (userId, webhookUrl, currency) => {
+    return new Promise((resolve, reject) => {
+      db.run("UPDATE users SET webhookUrl = ?, currency = ? WHERE id = ?", [webhookUrl, currency, userId], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      });
     });
   }
 };

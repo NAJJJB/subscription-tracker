@@ -56,6 +56,88 @@
       ⚠️ Demo limitations: Data is stored locally in your browser and will be lost when you clear browser data. Discord notifications are disabled.
     </div>
 
+    <!-- Currency Selector for Demo -->
+    <div style="margin-bottom: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <label style="font-weight: 600; color: #374151; min-width: fit-content;">Currency:</label>
+        <select id="currencySelect" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; background: white; flex-grow: 1;">
+          <option value="AFN">Afghan afghani</option>
+          <option value="ALL">Albanian lek</option>
+          <option value="ARS">Argentine peso</option>
+          <option value="AMD">Armenian dram</option>
+          <option value="AUD">Australian dollar</option>
+          <option value="AZN">Azerbaijani manat</option>
+          <option value="BHD">Bahraini dinar</option>
+          <option value="BDT">Bangladeshi taka</option>
+          <option value="BYN">Belarusian ruble</option>
+          <option value="BTN">Bhutanese ngultrum</option>
+          <option value="BAM">Bosnia-Herzegovina convertible mark</option>
+          <option value="BRL">Brazilian real</option>
+          <option value="GBP">British pound</option>
+          <option value="BGN">Bulgarian lev</option>
+          <option value="CAD">Canadian dollar</option>
+          <option value="CLP">Chilean peso</option>
+          <option value="CNY">Chinese yuan</option>
+          <option value="COP">Colombian peso</option>
+          <option value="HRK">Croatian kuna</option>
+          <option value="CZK">Czech koruna</option>
+          <option value="DKK">Danish krone</option>
+          <option value="EGP">Egyptian pound</option>
+          <option value="EUR">Euro</option>
+          <option value="GEL">Georgian lari</option>
+          <option value="HKD">Hong Kong dollar</option>
+          <option value="HUF">Hungarian forint</option>
+          <option value="ISK">Icelandic krona</option>
+          <option value="INR">Indian rupee</option>
+          <option value="IDR">Indonesian rupiah</option>
+          <option value="ILS">Israeli shekel</option>
+          <option value="JPY">Japanese yen</option>
+          <option value="JOD">Jordanian dinar</option>
+          <option value="KZT">Kazakhstani tenge</option>
+          <option value="KWD">Kuwaiti dinar</option>
+          <option value="KGS">Kyrgyzstani som</option>
+          <option value="LBP">Lebanese pound</option>
+          <option value="MKD">Macedonian denar</option>
+          <option value="MYR">Malaysian ringgit</option>
+          <option value="MVR">Maldivian rufiyaa</option>
+          <option value="MXN">Mexican peso</option>
+          <option value="MDL">Moldovan leu</option>
+          <option value="NPR">Nepalese rupee</option>
+          <option value="NZD">New Zealand dollar</option>
+          <option value="NOK">Norwegian krone</option>
+          <option value="OMR">Omani rial</option>
+          <option value="PKR">Pakistani rupee</option>
+          <option value="PEN">Peruvian sol</option>
+          <option value="PHP">Philippine peso</option>
+          <option value="PLN">Polish zloty</option>
+          <option value="QAR">Qatari riyal</option>
+          <option value="RON">Romanian leu</option>
+          <option value="RUB">Russian ruble</option>
+          <option value="SAR">Saudi riyal</option>
+          <option value="RSD">Serbian dinar</option>
+          <option value="SGD">Singapore dollar</option>
+          <option value="ZAR">South African rand</option>
+          <option value="KRW">South Korean won</option>
+          <option value="LKR">Sri Lankan rupee</option>
+          <option value="SEK">Swedish krona</option>
+          <option value="CHF">Swiss franc</option>
+          <option value="TJS">Tajikistani somoni</option>
+          <option value="THB">Thai baht</option>
+          <option value="TRY">Turkish lira</option>
+          <option value="TMT">Turkmenistani manat</option>
+          <option value="AED">UAE dirham</option>
+          <option value="UAH">Ukrainian hryvnia</option>
+          <option value="UYU">Uruguayan peso</option>
+          <option value="USD">US dollar</option>
+          <option value="UZS">Uzbekistani som</option>
+          <option value="VND">Vietnamese dong</option>
+        </select>
+      </div>
+      <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.75rem;">
+        Choose your preferred currency. Changes will apply immediately to all prices displayed.
+      </p>
+    </div>
+
     <div class="header">
       <h1 class="logo">Welcome, Demo User!</h1>
       <p class="subtitle">Try managing your subscriptions</p>
@@ -124,6 +206,38 @@
   <script>
     // Demo subscription management using localStorage
     const STORAGE_KEY = 'demo_subscriptions';
+    const CURRENCY_KEY = 'demo_currency';
+    
+    // Currency symbols mapping (alphabetically ordered)
+    const currencySymbols = {
+      'AED': 'د.إ', 'AFN': '؋', 'ALL': 'L', 'AMD': '֏', 'ARS': '$', 'AUD': 'A$',
+      'AZN': '₼', 'BAM': 'KM', 'BDT': '৳', 'BGN': 'лв', 'BHD': '.د.ب', 'BRL': 'R$',
+      'BTN': 'Nu.', 'BYN': 'Br', 'CAD': 'C$', 'CHF': 'CHF', 'CLP': '$', 'CNY': '¥',
+      'COP': '$', 'CZK': 'Kč', 'DKK': 'kr', 'EGP': '£', 'EUR': '€', 'GBP': '£',
+      'GEL': '₾', 'HKD': 'HK$', 'HRK': 'kn', 'HUF': 'Ft', 'IDR': 'Rp', 'ILS': '₪',
+      'INR': '₹', 'ISK': 'kr', 'JOD': 'د.ا', 'JPY': '¥', 'KGS': 'с', 'KRW': '₩',
+      'KWD': 'د.ك', 'KZT': '₸', 'LBP': '£', 'LKR': '₨', 'MDL': 'L', 'MKD': 'ден',
+      'MVR': '.ރ', 'MXN': '$', 'MYR': 'RM', 'NOK': 'kr', 'NPR': '₨', 'NZD': 'NZ$',
+      'OMR': '﷼', 'PEN': 'S/', 'PHP': '₱', 'PKR': '₨', 'PLN': 'zł', 'QAR': '﷼',
+      'RON': 'lei', 'RSD': 'din', 'RUB': '₽', 'SAR': '﷼', 'SEK': 'kr', 'SGD': 'S$',
+      'THB': '฿', 'TJS': 'ЅМ', 'TMT': 'T', 'TRY': '₺', 'UAH': '₴', 'USD': '$',
+      'UYU': '$', 'UZS': 'soʻm', 'VND': '₫', 'ZAR': 'R'
+    };
+    
+    // Get current currency
+    function getCurrentCurrency() {
+      return localStorage.getItem(CURRENCY_KEY) || 'USD';
+    }
+    
+    // Set current currency
+    function setCurrentCurrency(currency) {
+      localStorage.setItem(CURRENCY_KEY, currency);
+    }
+    
+    // Get currency symbol
+    function getCurrencySymbol(currency) {
+      return currencySymbols[currency] || currency;
+    }
     
     // Initialize with some sample data if empty
     function initializeDemoData() {
@@ -221,13 +335,16 @@
       totalEl.style.display = 'block';
       
       // Render subscription cards
+      const currentCurrency = getCurrentCurrency();
+      const currSymbol = getCurrencySymbol(currentCurrency);
+      
       listEl.innerHTML = subscriptions.map((sub, index) => `
         <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; background: white; margin-bottom: 1rem;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
             <div>
               <h4 style="margin: 0; color: #374151; font-size: 1.125rem;">${sub.name}</h4>
               <p style="margin: 0.25rem 0; color: #059669; font-weight: 600;">
-                $${sub.price}/${sub.renewalFrequency}
+                ${currSymbol}${sub.price}/${sub.renewalFrequency}
               </p>
             </div>
             <button onclick="removeSubscription(${index})" style="background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">
@@ -254,10 +371,10 @@
       });
       
       totalEl.innerHTML = `
-        <strong>Total Monthly Equivalent: $${totalMonthlyCost.toFixed(2)}</strong>
+        <strong>Total Monthly Equivalent: ${currSymbol}${totalMonthlyCost.toFixed(2)}</strong>
         <br>
         <small style="color: #6b7280; margin-top: 0.5rem; display: block;">
-          Estimated yearly cost: $${(totalMonthlyCost * 12).toFixed(2)}
+          Estimated yearly cost: ${currSymbol}${(totalMonthlyCost * 12).toFixed(2)}
         </small>
       `;
     }
@@ -308,6 +425,30 @@
     // Initialize demo on page load
     document.addEventListener('DOMContentLoaded', function() {
       initializeDemoData();
+      
+      // Set up currency selector
+      const currencySelect = document.getElementById('currencySelect');
+      currencySelect.value = getCurrentCurrency();
+      updatePricePlaceholder();
+      
+      // Handle currency changes
+      currencySelect.addEventListener('change', function() {
+        setCurrentCurrency(this.value);
+        renderSubscriptions();
+        updatePricePlaceholder();
+        
+        // Show feedback
+        const banner = document.querySelector('.demo-banner');
+        const originalText = banner.innerHTML;
+        banner.innerHTML = `💱 Currency changed to ${this.value}! All prices updated.`;
+        banner.style.background = 'linear-gradient(45deg, #0ea5e9, #06b6d4)';
+        
+        setTimeout(() => {
+          banner.innerHTML = originalText;
+          banner.style.background = 'linear-gradient(45deg, #ff6b6b, #feca57)';
+        }, 2000);
+      });
+      
       renderSubscriptions();
       
       // Set default date to next month
@@ -315,6 +456,14 @@
       nextMonth.setMonth(nextMonth.getMonth() + 1);
       document.getElementById('renewsAt').value = nextMonth.toISOString().split('T')[0];
     });
+    
+    // Update price input placeholder based on currency
+    function updatePricePlaceholder() {
+      const currentCurrency = getCurrentCurrency();
+      const symbol = getCurrencySymbol(currentCurrency);
+      const priceInput = document.getElementById('price');
+      priceInput.placeholder = `Price per billing cycle (${symbol})`;
+    }
   </script>
 </body>
 </html>
