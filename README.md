@@ -3,6 +3,7 @@
 
 A tool that keeps track of your subscriptions, for you.
 
+![Hackatime](https://hackatime-badge.hackclub.com/U0823QXHKMG/subscription-tracker)
 
 
 ## Demo
