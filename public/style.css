@@ -11,6 +11,8 @@
   --background-light: #F6F6F6;
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   --border-radius: 12px;
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-display: 'Poppins', sans-serif;
 }
 
 * {
@@ -20,13 +22,22 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-family-base) !important;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+/* Ensure Inter is used everywhere except logo */
+* {
+  font-family: var(--font-family-base) !important;
+}
+
+.logo {
+  font-family: var(--font-family-display) !important;
 }
 
 .container {
@@ -45,12 +56,8 @@ body {
   margin-bottom: 2.5rem;
 }
 
-.demo-banner {
-  font-family: 'Poppins', sans-serif;
-}  
-
 .logo {
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-family-display) !important;
   font-size: 2.5rem;
   font-weight: 700;
   background: linear-gradient(135deg, var(--discord-blurple), #7289da);
