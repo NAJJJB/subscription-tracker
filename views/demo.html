@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo - Subscription Tracker</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .demo-banner {
+      background: linear-gradient(45deg, #ff6b6b, #feca57);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .demo-banner a {
+      color: white;
+      text-decoration: underline;
+    }
+    .reset-button {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+    .reset-button:hover {
+      background: #b91c1c;
+    }
+    .limitations {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      color: #92400e;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="demo-banner">
+      🎮 DEMO MODE - Try Subscription Tracker! 
+      <a href="/">Sign up with Discord for the full experience</a>
+      <button class="reset-button" onclick="resetDemo()">🗑️ Reset Demo</button>
+    </div>
+    
+    <div class="limitations">
+      ⚠️ Demo limitations: Data is stored locally in your browser and will be lost when you clear browser data. Discord notifications are disabled.
+    </div>
+
+    <div class="header">
+      <h1 class="logo">Welcome, Demo User!</h1>
+      <p class="subtitle">Try managing your subscriptions</p>
+    </div>
+    
+    <form id="addForm">
+      <div class="form-group">
+        <input id="name" placeholder="Subscription name (e.g., Netflix, Spotify)" required />
+        <input id="price" type="number" step="0.01" placeholder="Price per billing cycle ($)" required />
+        <select id="renewalFrequency" required>
+          <option value="">How often it renews</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly (3 months)</option>
+          <option value="semi-annually">Semi-annually (6 months)</option>
+          <option value="yearly">Yearly</option>
+        </select>
+        <input id="renewsAt" type="date" placeholder="Next renewal date" required />
+        <select id="notifyDays" required>
+          <option value="">When to notify</option>
+          <option value="1">1 day before</option>
+          <option value="3">3 days before</option>
+          <option value="7">1 week before</option>
+          <option value="14">2 weeks before</option>
+          <option value="30">1 month before</option>
+        </select>
+        <button type="submit">Add Subscription</button>
+      </div>
+    </form>
+    
+    <!-- Demo Discord Webhook Section -->
+    <div style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px; border-left: 4px solid #5865F2; opacity: 0.6;">
+      <h3 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">🔔 Discord Notifications (Disabled in Demo)</h3>
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <input 
+          type="url" 
+          placeholder="Discord Webhook URL (disabled in demo)" 
+          disabled
+          style="flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; background: #f9fafb;"
+        />
+        <button disabled style="background: #9ca3af; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.875rem;">
+          Disabled
+        </button>
+      </div>
+      <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.75rem;">
+        Discord notifications are available in the full version with authentication.
+      </p>
+    </div>
+    
+    <div class="subscriptions-list">
+      <h3 style="margin-bottom: 1rem; color: #374151;">Your Demo Subscriptions</h3>
+      <div id="subscriptionsList">
+        <!-- Subscriptions will be populated by JavaScript -->
+      </div>
+      
+      <div id="totalCost" style="margin-top: 1.5rem; padding: 1rem; background: #f3f4f6; border-radius: 8px; display: none;">
+        <!-- Total cost will be calculated by JavaScript -->
+      </div>
+      
+      <div id="noSubscriptions" style="text-align: center; padding: 2rem; color: #6b7280;">
+        <p>No subscriptions yet. Add your first subscription above!</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Demo subscription management using localStorage
+    const STORAGE_KEY = 'demo_subscriptions';
+    
+    // Initialize with some sample data if empty
+    function initializeDemoData() {
+      const existing = localStorage.getItem(STORAGE_KEY);
+      if (!existing) {
+        const sampleData = [
+          {
+            name: "Netflix",
+            price: "15.99",
+            renewalFrequency: "monthly",
+            renewsAt: "2025-08-15",
+            notifyDays: "3"
+          },
+          {
+            name: "Spotify Premium",
+            price: "9.99",
+            renewalFrequency: "monthly", 
+            renewsAt: "2025-08-20",
+            notifyDays: "1"
+          },
+          {
+            name: "Adobe Creative Suite",
+            price: "52.99",
+            renewalFrequency: "monthly",
+            renewsAt: "2025-08-10",
+            notifyDays: "7"
+          }
+        ];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleData));
+      }
+    }
+    
+    // Get subscriptions from localStorage
+    function getSubscriptions() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+    
+    // Save subscriptions to localStorage
+    function saveSubscriptions(subscriptions) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(subscriptions));
+    }
+    
+    // Add new subscription
+    function addSubscription(subscription) {
+      const subscriptions = getSubscriptions();
+      subscriptions.push(subscription);
+      saveSubscriptions(subscriptions);
+      renderSubscriptions();
+    }
+    
+    // Remove subscription
+    function removeSubscription(index) {
+      if (confirm('Are you sure you want to remove this subscription?')) {
+        const subscriptions = getSubscriptions();
+        subscriptions.splice(index, 1);
+        saveSubscriptions(subscriptions);
+        renderSubscriptions();
+      }
+    }
+    
+    // Calculate monthly equivalent cost
+    function calculateMonthlyCost(price, frequency) {
+      const numPrice = parseFloat(price);
+      switch(frequency) {
+        case 'weekly': return numPrice * 4.33;
+        case 'monthly': return numPrice;
+        case 'quarterly': return numPrice / 3;
+        case 'semi-annually': return numPrice / 6;
+        case 'yearly': return numPrice / 12;
+        default: return numPrice;
+      }
+    }
+    
+    // Format date for display
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString();
+    }
+    
+    // Render subscriptions list
+    function renderSubscriptions() {
+      const subscriptions = getSubscriptions();
+      const listEl = document.getElementById('subscriptionsList');
+      const totalEl = document.getElementById('totalCost');
+      const noSubsEl = document.getElementById('noSubscriptions');
+      
+      if (subscriptions.length === 0) {
+        listEl.innerHTML = '';
+        totalEl.style.display = 'none';
+        noSubsEl.style.display = 'block';
+        return;
+      }
+      
+      noSubsEl.style.display = 'none';
+      totalEl.style.display = 'block';
+      
+      // Render subscription cards
+      listEl.innerHTML = subscriptions.map((sub, index) => `
+        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; background: white; margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <div>
+              <h4 style="margin: 0; color: #374151; font-size: 1.125rem;">${sub.name}</h4>
+              <p style="margin: 0.25rem 0; color: #059669; font-weight: 600;">
+                $${sub.price}/${sub.renewalFrequency}
+              </p>
+            </div>
+            <button onclick="removeSubscription(${index})" style="background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">
+              Remove
+            </button>
+          </div>
+          ${sub.renewsAt ? `
+            <p style="margin: 0.25rem 0; color: #6b7280; font-size: 0.875rem;">
+              <strong>Renews:</strong> ${formatDate(sub.renewsAt)}
+            </p>
+          ` : ''}
+          ${sub.notifyDays ? `
+            <p style="margin: 0.25rem 0; color: #6b7280; font-size: 0.875rem;">
+              <strong>Notify:</strong> ${sub.notifyDays} day${sub.notifyDays > 1 ? 's' : ''} before renewal
+            </p>
+          ` : ''}
+        </div>
+      `).join('');
+      
+      // Calculate and display totals
+      let totalMonthlyCost = 0;
+      subscriptions.forEach(sub => {
+        totalMonthlyCost += calculateMonthlyCost(sub.price, sub.renewalFrequency);
+      });
+      
+      totalEl.innerHTML = `
+        <strong>Total Monthly Equivalent: $${totalMonthlyCost.toFixed(2)}</strong>
+        <br>
+        <small style="color: #6b7280; margin-top: 0.5rem; display: block;">
+          Estimated yearly cost: $${(totalMonthlyCost * 12).toFixed(2)}
+        </small>
+      `;
+    }
+    
+    // Reset demo data
+    function resetDemo() {
+      if (confirm('This will delete all demo data and start fresh. Are you sure?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        initializeDemoData();
+        renderSubscriptions();
+        
+        // Clear form
+        document.getElementById('addForm').reset();
+        
+        alert('Demo data has been reset with sample subscriptions!');
+      }
+    }
+    
+    // Handle form submission
+    document.getElementById('addForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const subscription = {
+        name: document.getElementById('name').value,
+        price: document.getElementById('price').value,
+        renewalFrequency: document.getElementById('renewalFrequency').value,
+        renewsAt: document.getElementById('renewsAt').value,
+        notifyDays: document.getElementById('notifyDays').value
+      };
+      
+      addSubscription(subscription);
+      
+      // Clear form
+      this.reset();
+      
+      // Show success message
+      const banner = document.querySelector('.demo-banner');
+      const originalText = banner.innerHTML;
+      banner.innerHTML = '✅ Subscription added successfully! (Demo mode)';
+      banner.style.background = 'linear-gradient(45deg, #10b981, #059669)';
+      
+      setTimeout(() => {
+        banner.innerHTML = originalText;
+        banner.style.background = 'linear-gradient(45deg, #ff6b6b, #feca57)';
+      }, 2000);
+    });
+    
+    // Initialize demo on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeDemoData();
+      renderSubscriptions();
+      
+      // Set default date to next month
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      document.getElementById('renewsAt').value = nextMonth.toISOString().split('T')[0];
+    });
+  </script>
+</body>
+</html>

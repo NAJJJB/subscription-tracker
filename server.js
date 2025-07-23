@@ -35,6 +35,11 @@ app.get("/", (req, res) => {
   res.render("index", { user: req.session.user });
 });
 
+// Demo page - no authentication required
+app.get("/demo", (req, res) => {
+  res.render("demo");
+});
+
 app.get("/login", (req, res) => {
   const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=identify`;
   res.redirect(discordAuthUrl);
