@@ -21,8 +21,16 @@
     <form method="POST" action="/add">
       <div class="form-group">
         <input name="name" placeholder="Subscription name (e.g., Netflix, Spotify)" required />
-        <input name="price" type="number" step="0.01" placeholder="Monthly price ($)" required />
-        <input name="renewsAt" type="date" placeholder="Renewal date" required />
+        <input name="price" type="number" step="0.01" placeholder="Price per billing cycle ($)" required />
+        <select name="renewalFrequency" required>
+          <option value="">How often it renews</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly (3 months)</option>
+          <option value="semi-annually">Semi-annually (6 months)</option>
+          <option value="yearly">Yearly</option>
+        </select>
+        <input name="renewsAt" type="date" placeholder="Next renewal date" required />
         <select name="notifyDays" required>
           <option value="">When to notify</option>
           <option value="1">1 day before</option>
@@ -65,7 +73,9 @@
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
                 <div>
                   <h4 style="margin: 0; color: #374151; font-size: 1.125rem;"><%= sub.name %></h4>
-                  <p style="margin: 0.25rem 0; color: #059669; font-weight: 600;">$<%= sub.price %>/month</p>
+                  <p style="margin: 0.25rem 0; color: #059669; font-weight: 600;">
+                    $<%= sub.price %>/<%= sub.renewalFrequency || 'month' %>
+                  </p>
                 </div>
                 <form method="POST" action="/remove" style="margin: 0;">
                   <input type="hidden" name="name" value="<%= sub.name %>" />
@@ -86,7 +96,40 @@
           <% }) %>
         </div>
         <div style="margin-top: 1.5rem; padding: 1rem; background: #f3f4f6; border-radius: 8px;">
-          <strong>Total Monthly Cost: $<%= subscriptions.reduce((total, sub) => total + parseFloat(sub.price), 0).toFixed(2) %></strong>
+          <%
+            // Calculate monthly equivalent cost
+            let totalMonthlyCost = 0;
+            subscriptions.forEach(sub => {
+              const price = parseFloat(sub.price);
+              const frequency = sub.renewalFrequency || 'monthly';
+              
+              // Convert to monthly equivalent
+              switch(frequency) {
+                case 'weekly':
+                  totalMonthlyCost += price * 4.33; // Average weeks per month
+                  break;
+                case 'monthly':
+                  totalMonthlyCost += price;
+                  break;
+                case 'quarterly':
+                  totalMonthlyCost += price / 3;
+                  break;
+                case 'semi-annually':
+                  totalMonthlyCost += price / 6;
+                  break;
+                case 'yearly':
+                  totalMonthlyCost += price / 12;
+                  break;
+                default:
+                  totalMonthlyCost += price; // Default to monthly
+              }
+            });
+          %>
+          <strong>Total Monthly Equivalent: $<%= totalMonthlyCost.toFixed(2) %></strong>
+          <br>
+          <small style="color: #6b7280; margin-top: 0.5rem; display: block;">
+            Estimated yearly cost: $<%= (totalMonthlyCost * 12).toFixed(2) %>
+          </small>
         </div>
       <% } else { %>
         <div style="text-align: center; padding: 2rem; color: #6b7280;">

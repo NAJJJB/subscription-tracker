@@ -3,20 +3,21 @@ const db = new sqlite3.Database("subs.db");
 
 db.serialize(() => {
   db.run("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT, webhookUrl TEXT)");
-  db.run("CREATE TABLE IF NOT EXISTS subscriptions (userId TEXT, name TEXT, price REAL, renewsAt TEXT, notifyDays INTEGER)");
+  db.run("CREATE TABLE IF NOT EXISTS subscriptions (userId TEXT, name TEXT, price REAL, renewsAt TEXT, notifyDays INTEGER, renewalFrequency TEXT)");
   
   // Add new columns to existing table if they don't exist
   db.run("ALTER TABLE subscriptions ADD COLUMN renewsAt TEXT", () => {});
   db.run("ALTER TABLE subscriptions ADD COLUMN notifyDays INTEGER", () => {});
   db.run("ALTER TABLE users ADD COLUMN webhookUrl TEXT", () => {});
+  db.run("ALTER TABLE subscriptions ADD COLUMN renewalFrequency TEXT", () => {});
 });
 
 module.exports = {
   addUser: (id, name) => {
     db.run("INSERT OR IGNORE INTO users (id, name) VALUES (?, ?)", [id, name]);
   },
-  addSubscription: (userId, name, price, renewsAt, notifyDays) => {
-    db.run("INSERT INTO subscriptions (userId, name, price, renewsAt, notifyDays) VALUES (?, ?, ?, ?, ?)", [userId, name, price, renewsAt, notifyDays]);
+  addSubscription: (userId, name, price, renewsAt, notifyDays, renewalFrequency) => {
+    db.run("INSERT INTO subscriptions (userId, name, price, renewsAt, notifyDays, renewalFrequency) VALUES (?, ?, ?, ?, ?, ?)", [userId, name, price, renewsAt, notifyDays, renewalFrequency]);
   },
   getSubscriptions: (userId) => {
     return new Promise((resolve, reject) => {

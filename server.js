@@ -100,17 +100,18 @@ app.get("/admin/login", (req, res) => {
 
 app.post("/add", async (req, res) => {
   if (!req.session.user) return res.redirect("/");
-  const { name, price, renewsAt, notifyDays } = req.body;
+  const { name, price, renewsAt, notifyDays, renewalFrequency } = req.body;
   
   // Add subscription to database
-  await db.addSubscription(req.session.user.id, name, price, renewsAt, notifyDays);
+  await db.addSubscription(req.session.user.id, name, price, renewsAt, notifyDays, renewalFrequency);
   
   // Send new subscription notification
   await sendNewSubscriptionNotification(req.session.user.id, {
     name,
     price,
     renewsAt,
-    notifyDays
+    notifyDays,
+    renewalFrequency
   });
   
   res.redirect("/dashboard");
@@ -143,7 +144,7 @@ async function sendDiscordNotification(webhookUrl, subscription, type = 'renewal
         fields: [
           {
             name: "💰 Price",
-            value: `$${subscription.price}/month`,
+            value: `$${subscription.price}/${subscription.renewalFrequency || 'month'}`,
             inline: true
           },
           {
@@ -170,7 +171,7 @@ async function sendDiscordNotification(webhookUrl, subscription, type = 'renewal
         fields: [
           {
             name: "💰 Price",
-            value: `$${subscription.price}/month`,
+            value: `$${subscription.price}/${subscription.renewalFrequency || 'month'}`,
             inline: true
           },
           {
