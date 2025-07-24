@@ -331,11 +331,6 @@
               }
             });
           %>
-          <strong>Total Monthly Equivalent: <%= getCurrencySymbol(currency) %><%= totalMonthlyCost.toFixed(2) %></strong>
-          <br>
-          <small style="color: #6b7280; margin-top: 0.5rem; display: block;">
-            Estimated yearly cost: <%= getCurrencySymbol(currency) %><%= (totalMonthlyCost * 12).toFixed(2) %>
-          </small>
         </div>
       <% } else { %>
         <div style="text-align: center; padding: 2rem; color: #6b7280;">
