@@ -165,6 +165,67 @@
       </div>
     </div>
     
+    <!-- Edit Subscription Modal -->
+    <div class="modal-overlay" id="editModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Edit Subscription</h2>
+          <button class="close-btn" onclick="closeEditModal()">&times;</button>
+        </div>
+        
+        <form id="editForm">
+          <input type="hidden" id="editOldName" name="oldName" />
+          <div class="setting-group">
+            <label class="setting-label" for="editName">Subscription Name</label>
+            <input type="text" id="editName" name="name" placeholder="Subscription name (e.g., Netflix, Spotify)" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;" />
+          </div>
+          
+          <div class="setting-group">
+            <label class="setting-label" for="editPrice">Price per billing cycle</label>
+            <input type="number" id="editPrice" name="price" step="0.01" placeholder="Price ($)" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;" />
+          </div>
+          
+          <div class="setting-group">
+            <label class="setting-label" for="editRenewalFrequency">Renewal Frequency</label>
+            <select id="editRenewalFrequency" name="renewalFrequency" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;">
+              <option value="">How often it renews</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly (3 months)</option>
+              <option value="semi-annually">Semi-annually (6 months)</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+          
+          <div class="setting-group">
+            <label class="setting-label" for="editRenewsAt">Next renewal date</label>
+            <input type="date" id="editRenewsAt" name="renewsAt" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;" />
+          </div>
+          
+          <div class="setting-group">
+            <label class="setting-label" for="editNotifyDays">Notification timing</label>
+            <select id="editNotifyDays" name="notifyDays" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;">
+              <option value="">When to notify</option>
+              <option value="1">1 day before</option>
+              <option value="3">3 days before</option>
+              <option value="7">1 week before</option>
+              <option value="14">2 weeks before</option>
+              <option value="30">1 month before</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+            <button type="button" onclick="closeEditModal()" style="padding: 0.75rem 1.5rem; border: 2px solid #e5e7eb; background: white; color: #374151; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+              Cancel
+            </button>
+            <button type="submit" style="padding: 0.75rem 1.5rem; border: none; background: #3b82f6; color: white; border-radius: 8px; cursor: pointer; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
+              Update Subscription
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
     <form method="POST" action="/add">
       <div class="form-group">
         <input name="name" placeholder="Subscription name (e.g., Netflix, Spotify)" required />
@@ -219,10 +280,13 @@
                     <%= getCurrencySymbol(currency) %><%= sub.price %>/<%= sub.renewalFrequency || 'month' %>
                   </p>
                 </div>
-                <form method="POST" action="/remove" style="margin: 0;">
-                  <input type="hidden" name="name" value="<%= sub.name %>" />
-                  <button type="submit" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;" onclick="return confirm('Are you sure you want to remove this subscription?')">Remove</button>
-                </form>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button onclick="openEditModal('<%= sub.name %>', '<%= sub.price %>', '<%= sub.renewsAt %>', '<%= sub.notifyDays %>', '<%= sub.renewalFrequency %>')" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #3b82f6; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Edit</button>
+                  <form method="POST" action="/remove" style="margin: 0;">
+                    <input type="hidden" name="name" value="<%= sub.name %>" />
+                    <button type="submit" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;" onclick="return confirm('Are you sure you want to remove this subscription?')">Remove</button>
+                  </form>
+                </div>
               </div>
               <% if (sub.renewsAt) { %>
                 <p style="margin: 0.25rem 0; color: #6b7280; font-size: 0.875rem;">
@@ -325,6 +389,63 @@
       } catch (error) {
         console.error('Error saving settings:', error);
         alert('Failed to save settings. Please try again.');
+      }
+    });
+
+    // Edit modal functions
+    function openEditModal(name, price, renewsAt, notifyDays, renewalFrequency) {
+      document.getElementById('editOldName').value = name;
+      document.getElementById('editName').value = name;
+      document.getElementById('editPrice').value = price;
+      document.getElementById('editRenewsAt').value = renewsAt;
+      document.getElementById('editNotifyDays').value = notifyDays;
+      document.getElementById('editRenewalFrequency').value = renewalFrequency;
+      document.getElementById('editModal').style.display = 'flex';
+    }
+    
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+    
+    // Close edit modal when clicking outside
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeEditModal();
+      }
+    });
+    
+    // Handle edit form submission
+    document.getElementById('editForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = {
+        oldName: formData.get('oldName'),
+        name: formData.get('name'),
+        price: formData.get('price'),
+        renewsAt: formData.get('renewsAt'),
+        notifyDays: formData.get('notifyDays'),
+        renewalFrequency: formData.get('renewalFrequency')
+      };
+      
+      try {
+        const response = await fetch('/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          // Reload the page to reflect changes
+          window.location.reload();
+        } else {
+          alert('Failed to update subscription. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error updating subscription:', error);
+        alert('Failed to update subscription. Please try again.');
       }
     });
   </script>

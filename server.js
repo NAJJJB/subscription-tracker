@@ -334,6 +334,19 @@ app.post("/remove", async (req, res) => {
   res.redirect("/dashboard");
 });
 
+app.post("/update", async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ error: "Unauthorized" });
+  
+  try {
+    const { oldName, name, price, renewsAt, notifyDays, renewalFrequency } = req.body;
+    await db.updateSubscription(req.session.user.id, oldName, name, price, renewsAt, notifyDays, renewalFrequency);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Update subscription error:', error);
+    res.status(500).json({ error: "Failed to update subscription" });
+  }
+});
+
 app.post("/webhook", async (req, res) => {
   if (!req.session.user) return res.redirect("/");
   const { webhookUrl } = req.body;

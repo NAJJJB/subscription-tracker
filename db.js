@@ -36,6 +36,15 @@ module.exports = {
       });
     });
   },
+  updateSubscription: (userId, oldName, name, price, renewsAt, notifyDays, renewalFrequency) => {
+    return new Promise((resolve, reject) => {
+      db.run("UPDATE subscriptions SET name = ?, price = ?, renewsAt = ?, notifyDays = ?, renewalFrequency = ? WHERE userId = ? AND name = ?", 
+        [name, price, renewsAt, notifyDays, renewalFrequency, userId, oldName], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      });
+    });
+  },
   updateUserWebhook: (userId, webhookUrl) => {
     return new Promise((resolve, reject) => {
       db.run("UPDATE users SET webhookUrl = ? WHERE id = ?", [webhookUrl, userId], function(err) {

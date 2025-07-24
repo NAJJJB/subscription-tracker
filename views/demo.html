@@ -201,6 +201,66 @@
         <p>No subscriptions yet. Add your first subscription above!</p>
       </div>
     </div>
+
+    <!-- Edit Subscription Modal -->
+    <div id="demoEditModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000;">
+      <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb;">
+          <h2 style="font-size: 1.5rem; font-weight: 600; color: #374151; margin: 0;">Edit Subscription</h2>
+          <button onclick="closeDemoEditModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280; padding: 0.25rem; border-radius: 4px;">&times;</button>
+        </div>
+        
+        <form id="demoEditForm">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Subscription Name</label>
+            <input type="text" id="demoEditName" placeholder="Subscription name (e.g., Netflix, Spotify)" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;" />
+          </div>
+          
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Price per billing cycle</label>
+            <input type="number" id="demoEditPrice" step="0.01" placeholder="Price ($)" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;" />
+          </div>
+          
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Renewal Frequency</label>
+            <select id="demoEditRenewalFrequency" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;">
+              <option value="">How often it renews</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly (3 months)</option>
+              <option value="semi-annually">Semi-annually (6 months)</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+          
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Next renewal date</label>
+            <input type="date" id="demoEditRenewsAt" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;" />
+          </div>
+          
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Notification timing</label>
+            <select id="demoEditNotifyDays" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; background: white; transition: border-color 0.2s;">
+              <option value="">When to notify</option>
+              <option value="1">1 day before</option>
+              <option value="3">3 days before</option>
+              <option value="7">1 week before</option>
+              <option value="14">2 weeks before</option>
+              <option value="30">1 month before</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+            <button type="button" onclick="closeDemoEditModal()" style="padding: 0.75rem 1.5rem; border: 2px solid #e5e7eb; background: white; color: #374151; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='white'">
+              Cancel
+            </button>
+            <button type="submit" style="padding: 0.75rem 1.5rem; border: none; background: #3b82f6; color: white; border-radius: 8px; cursor: pointer; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
+              Update Subscription
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -299,6 +359,34 @@
       }
     }
     
+    // Edit subscription functions
+    let editingIndex = -1;
+    
+    function openDemoEditModal(index) {
+      const subscriptions = getSubscriptions();
+      const sub = subscriptions[index];
+      editingIndex = index;
+      
+      document.getElementById('demoEditName').value = sub.name;
+      document.getElementById('demoEditPrice').value = sub.price;
+      document.getElementById('demoEditRenewalFrequency').value = sub.renewalFrequency;
+      document.getElementById('demoEditRenewsAt').value = sub.renewsAt;
+      document.getElementById('demoEditNotifyDays').value = sub.notifyDays;
+      document.getElementById('demoEditModal').style.display = 'flex';
+    }
+    
+    function closeDemoEditModal() {
+      document.getElementById('demoEditModal').style.display = 'none';
+      editingIndex = -1;
+    }
+    
+    function updateSubscription(index, updatedSub) {
+      const subscriptions = getSubscriptions();
+      subscriptions[index] = updatedSub;
+      saveSubscriptions(subscriptions);
+      renderSubscriptions();
+    }
+    
     // Calculate monthly equivalent cost
     function calculateMonthlyCost(price, frequency) {
       const numPrice = parseFloat(price);
@@ -347,9 +435,14 @@
                 ${currSymbol}${sub.price}/${sub.renewalFrequency}
               </p>
             </div>
-            <button onclick="removeSubscription(${index})" style="background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">
-              Remove
-            </button>
+            <div style="display: flex; gap: 0.5rem;">
+              <button onclick="openDemoEditModal(${index})" style="background: #3b82f6; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">
+                Edit
+              </button>
+              <button onclick="removeSubscription(${index})" style="background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">
+                Remove
+              </button>
+            </div>
           </div>
           ${sub.renewsAt ? `
             <p style="margin: 0.25rem 0; color: #6b7280; font-size: 0.875rem;">
@@ -420,6 +513,42 @@
         banner.innerHTML = originalText;
         banner.style.background = 'linear-gradient(45deg, #ff6b6b, #feca57)';
       }, 2000);
+    });
+    
+    // Handle demo edit form submission
+    document.getElementById('demoEditForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (editingIndex === -1) return;
+      
+      const updatedSubscription = {
+        name: document.getElementById('demoEditName').value,
+        price: document.getElementById('demoEditPrice').value,
+        renewalFrequency: document.getElementById('demoEditRenewalFrequency').value,
+        renewsAt: document.getElementById('demoEditRenewsAt').value,
+        notifyDays: document.getElementById('demoEditNotifyDays').value
+      };
+      
+      updateSubscription(editingIndex, updatedSubscription);
+      closeDemoEditModal();
+      
+      // Show success message
+      const banner = document.querySelector('.demo-banner');
+      const originalText = banner.innerHTML;
+      banner.innerHTML = '✅ Subscription updated successfully! (Demo mode)';
+      banner.style.background = 'linear-gradient(45deg, #10b981, #059669)';
+      
+      setTimeout(() => {
+        banner.innerHTML = originalText;
+        banner.style.background = 'linear-gradient(45deg, #ff6b6b, #feca57)';
+      }, 2000);
+    });
+    
+    // Close demo edit modal when clicking outside
+    document.getElementById('demoEditModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeDemoEditModal();
+      }
     });
     
     // Initialize demo on page load
