@@ -1,5 +1,7 @@
-/* Import Google Fonts for customizable typography */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+/* Import Inter font with full OpenType feature support */
+@import url('https://rsms.me/inter/inter.css');
+/* Import Poppins from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
   --discord-blurple: #5865F2;
@@ -23,6 +25,7 @@
 
 body {
   font-family: var(--font-family-base) !important;
+  font-feature-settings: "ss01" 1; /* Enable Inter alternate digits */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   display: flex;
@@ -31,9 +34,21 @@ body {
   padding: 20px;
 }
 
-/* Ensure Inter is used everywhere except logo */
+/* Ensure Inter is used everywhere except logo with alternate digits enabled */
 * {
   font-family: var(--font-family-base) !important;
+  font-feature-settings: "ss01" 1; /* Enable Inter alternate digits globally */
+}
+
+/* Specific numeric styling for enhanced alternate digits */
+.price, .cost, .total, .stats, [class*="price"], [class*="cost"] {
+  font-feature-settings: "ss01" 1, "tnum" 1; /* Alternate digits + tabular numbers */
+  font-variant-numeric: slashed-zero;
+}
+
+/* Apply to any element containing numbers */
+*:contains('$'), *:contains('€'), *:contains('£'), *:contains('¥') {
+  font-feature-settings: "ss01" 1, "tnum" 1;
 }
 
 .logo {

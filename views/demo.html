@@ -48,15 +48,64 @@
   <div class="dashboard-container">
     <div class="demo-banner">
       🎮 DEMO MODE - Try Subscription Tracker! 
-      <a href="/">Sign up with Discord for the full experience</a>
+      <a href="/">Sign up with Discord for notifications</a>
       <button class="reset-button" onclick="resetDemo()">🗑️ Reset Demo</button>
     </div>
     
     <div class="limitations">
-      ⚠️ Demo limitations: Data is stored locally in your browser and will be lost when you clear browser data. Discord notifications are disabled.
+      ⚠️ Notice: Data is stored locally in your browser and will be lost when you clear browser data. Discord notifications are disabled in the demo.
     </div>
 
-    <!-- Currency Selector for Demo -->
+    <div class="header">
+      <h1 class="logo">Welcome, Demo!</h1>
+      <p class="subtitle">Try managing your subscriptions</p>
+    </div>
+    
+    <form id="addForm">
+      <div class="form-group">
+        <input id="name" placeholder="Subscription name (e.g., Netflix, Spotify)" required />
+        <input id="price" type="number" step="0.01" placeholder="Price per billing cycle" required />
+        <select id="renewalFrequency" required>
+          <option value="">How often it renews</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly (3 months)</option>
+          <option value="semi-annually">Semi-annually (6 months)</option>
+          <option value="yearly">Yearly</option>
+        </select>
+        <input id="renewsAt" type="date" placeholder="Next renewal date" required />
+        <select id="notifyDays" required>
+          <option value="">When to notify</option>
+          <option value="1">1 day before</option>
+          <option value="3">3 days before</option>
+          <option value="7">1 week before</option>
+          <option value="14">2 weeks before</option>
+          <option value="30">1 month before</option>
+        </select>
+        <button type="submit">Add Subscription</button>
+      </div>
+    </form>
+    
+    <!-- Demo Discord Webhook Section -->
+    <div style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px; border-left: 4px solid #5865F2; opacity: 0.6;">
+      <h3 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">🔔 Discord Notifications (Disabled in Demo)</h3>
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <input 
+          type="url" 
+          placeholder="Discord Webhook (disabled)" 
+          disabled
+          style="flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; background: #f9fafb;"
+        />
+        <button disabled style="background: #9ca3af; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.875rem;">
+          Disabled
+        </button>
+      </div>
+      <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.75rem;">
+        <strong>Note:</strong> Discord notifications are available in the full version with authentication.
+      </p>
+    </div>
+
+        <!-- Currency Selector for Demo -->
     <div style="margin-bottom: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
       <div style="display: flex; align-items: center; gap: 1rem;">
         <label style="font-weight: 600; color: #374151; min-width: fit-content;">Currency:</label>
@@ -135,55 +184,6 @@
       </div>
       <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.75rem;">
         Choose your preferred currency. Changes will apply immediately to all prices displayed.
-      </p>
-    </div>
-
-    <div class="header">
-      <h1 class="logo">Welcome, Demo User!</h1>
-      <p class="subtitle">Try managing your subscriptions</p>
-    </div>
-    
-    <form id="addForm">
-      <div class="form-group">
-        <input id="name" placeholder="Subscription name (e.g., Netflix, Spotify)" required />
-        <input id="price" type="number" step="0.01" placeholder="Price per billing cycle ($)" required />
-        <select id="renewalFrequency" required>
-          <option value="">How often it renews</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="quarterly">Quarterly (3 months)</option>
-          <option value="semi-annually">Semi-annually (6 months)</option>
-          <option value="yearly">Yearly</option>
-        </select>
-        <input id="renewsAt" type="date" placeholder="Next renewal date" required />
-        <select id="notifyDays" required>
-          <option value="">When to notify</option>
-          <option value="1">1 day before</option>
-          <option value="3">3 days before</option>
-          <option value="7">1 week before</option>
-          <option value="14">2 weeks before</option>
-          <option value="30">1 month before</option>
-        </select>
-        <button type="submit">Add Subscription</button>
-      </div>
-    </form>
-    
-    <!-- Demo Discord Webhook Section -->
-    <div style="margin-bottom: 2rem; padding: 1rem; background: #f8fafc; border-radius: 8px; border-left: 4px solid #5865F2; opacity: 0.6;">
-      <h3 style="margin: 0 0 1rem 0; color: #374151; font-size: 1rem;">🔔 Discord Notifications (Disabled in Demo)</h3>
-      <div style="display: flex; gap: 1rem; align-items: center;">
-        <input 
-          type="url" 
-          placeholder="Discord Webhook URL (disabled in demo)" 
-          disabled
-          style="flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; background: #f9fafb;"
-        />
-        <button disabled style="background: #9ca3af; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.875rem;">
-          Disabled
-        </button>
-      </div>
-      <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.75rem;">
-        Discord notifications are available in the full version with authentication.
       </p>
     </div>
     

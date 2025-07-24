@@ -247,7 +247,7 @@
           <option value="14">2 weeks before</option>
           <option value="30">1 month before</option>
         </select>
-        <button type="submit" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">Add Subscription</button>
+        <button type="submit" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-feature-settings: 'ss01' 1;">Add Subscription</button>
       </div>
     </form>
 
@@ -281,10 +281,10 @@
                   </p>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
-                  <button onclick="openEditModal('<%= sub.name %>', '<%= sub.price %>', '<%= sub.renewsAt %>', '<%= sub.notifyDays %>', '<%= sub.renewalFrequency %>')" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #3b82f6; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Edit</button>
+                  <button onclick="openEditModal('<%= sub.name %>', '<%= sub.price %>', '<%= sub.renewsAt %>', '<%= sub.notifyDays %>', '<%= sub.renewalFrequency %>')" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-feature-settings: 'ss01' 1; background: #3b82f6; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">Edit</button>
                   <form method="POST" action="/remove" style="margin: 0;">
                     <input type="hidden" name="name" value="<%= sub.name %>" />
-                    <button type="submit" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;" onclick="return confirm('Are you sure you want to remove this subscription?')">Remove</button>
+                    <button type="submit" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-feature-settings: 'ss01' 1; background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.875rem;" onclick="return confirm('Are you sure you want to remove this subscription?')">Remove</button>
                   </form>
                 </div>
               </div>
