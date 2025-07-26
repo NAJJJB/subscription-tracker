@@ -11,6 +11,7 @@ db.serialize(() => {
   db.run("ALTER TABLE users ADD COLUMN webhookUrl TEXT", () => {});
   db.run("ALTER TABLE subscriptions ADD COLUMN renewalFrequency TEXT", () => {});
   db.run("ALTER TABLE users ADD COLUMN currency TEXT DEFAULT 'USD'", () => {});
+  db.run("ALTER TABLE subscriptions ADD COLUMN lastNotificationSent TEXT", () => {});
 });
 
 module.exports = {
@@ -38,7 +39,8 @@ module.exports = {
   },
   updateSubscription: (userId, oldName, name, price, renewsAt, notifyDays, renewalFrequency) => {
     return new Promise((resolve, reject) => {
-      db.run("UPDATE subscriptions SET name = ?, price = ?, renewsAt = ?, notifyDays = ?, renewalFrequency = ? WHERE userId = ? AND name = ?", 
+      // Reset lastNotificationSent when updating subscription details to allow new notifications
+      db.run("UPDATE subscriptions SET name = ?, price = ?, renewsAt = ?, notifyDays = ?, renewalFrequency = ?, lastNotificationSent = NULL WHERE userId = ? AND name = ?", 
         [name, price, renewsAt, notifyDays, renewalFrequency, userId, oldName], function(err) {
         if (err) reject(err);
         else resolve(this.changes);
@@ -64,6 +66,8 @@ module.exports = {
   getSubscriptionsDueForNotification: () => {
     return new Promise((resolve, reject) => {
       const today = new Date();
+      const todayString = today.toISOString().split('T')[0]; // Get YYYY-MM-DD format
+      
       const query = `
         SELECT s.*, u.name as userName, u.webhookUrl 
         FROM subscriptions s 
@@ -71,9 +75,10 @@ module.exports = {
         WHERE u.webhookUrl IS NOT NULL 
         AND s.renewsAt IS NOT NULL 
         AND s.notifyDays IS NOT NULL
+        AND (s.lastNotificationSent IS NULL OR s.lastNotificationSent != ?)
       `;
       
-      db.all(query, [], (err, rows) => {
+      db.all(query, [todayString], (err, rows) => {
         if (err) reject(err);
         else {
           const dueNotifications = rows.filter(sub => {
@@ -140,6 +145,23 @@ module.exports = {
   updateUserPreferences: (userId, webhookUrl, currency) => {
     return new Promise((resolve, reject) => {
       db.run("UPDATE users SET webhookUrl = ?, currency = ? WHERE id = ?", [webhookUrl, currency, userId], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      });
+    });
+  },
+  markNotificationSent: (userId, subscriptionName) => {
+    return new Promise((resolve, reject) => {
+      const today = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD format
+      db.run("UPDATE subscriptions SET lastNotificationSent = ? WHERE userId = ? AND name = ?", [today, userId, subscriptionName], function(err) {
+        if (err) reject(err);
+        else resolve(this.changes);
+      });
+    });
+  },
+  resetNotificationTracking: (userId, subscriptionName) => {
+    return new Promise((resolve, reject) => {
+      db.run("UPDATE subscriptions SET lastNotificationSent = NULL WHERE userId = ? AND name = ?", [userId, subscriptionName], function(err) {
         if (err) reject(err);
         else resolve(this.changes);
       });

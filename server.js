@@ -521,11 +521,25 @@ async function sendUrgentNotificationToAll(title, message) {
 // Check for notifications daily (can set up cron job)
 async function checkNotifications() {
   try {
+    console.log(`🔄 Checking for due notifications at ${new Date().toLocaleString()}`);
     const dueNotifications = await db.getSubscriptionsDueForNotification();
+    
+    if (dueNotifications.length === 0) {
+      console.log('📭 No notifications due at this time');
+    } else {
+      console.log(`📬 Found ${dueNotifications.length} notification(s) to send`);
+    }
     
     for (const subscription of dueNotifications) {
       if (subscription.webhookUrl) {
-        await sendDiscordNotification(subscription.webhookUrl, subscription, 'renewal');
+        try {
+          await sendDiscordNotification(subscription.webhookUrl, subscription, 'renewal');
+          // Mark this notification as sent to prevent duplicates
+          await db.markNotificationSent(subscription.userId, subscription.name);
+          console.log(`✅ Notification sent for ${subscription.name} (User: ${subscription.userName})`);
+        } catch (error) {
+          console.error(`❌ Failed to send notification for ${subscription.name}:`, error);
+        }
       }
     }
   } catch (error) {
@@ -754,6 +768,26 @@ app.post("/admin/urgent-notification", verifyAdmin, async (req, res) => {
   } catch (error) {
     console.error("Error sending urgent notification:", error);
     res.status(500).json({ error: "Failed to send notifications" });
+  }
+});
+
+// Reset notification tracking for testing/debugging
+app.post("/admin/reset-notifications", verifyAdmin, async (req, res) => {
+  try {
+    const { userId, subscriptionName } = req.body;
+    
+    if (!userId || !subscriptionName) {
+      return res.status(400).json({ error: "userId and subscriptionName are required" });
+    }
+    
+    console.log(`🔄 ADMIN RESET NOTIFICATION TRACKING by ${req.session.user.name}: ${subscriptionName} for user ${userId}`);
+    
+    await db.resetNotificationTracking(userId, subscriptionName);
+    
+    res.json({ success: true, message: "Notification tracking reset successfully" });
+  } catch (error) {
+    console.error("Error resetting notification tracking:", error);
+    res.status(500).json({ error: "Failed to reset notification tracking" });
   }
 });
 
